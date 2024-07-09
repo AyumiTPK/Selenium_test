@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import Select
 
 URL_SIGNUP = 'https://moneyway.fly.dev/users/sign_up'
 URL_LOGIN = 'https://moneyway.fly.dev/users/sign_in'
-URL_HOME = 'https://moneyway.fly.dev/'
+URL_HOME = 'https://moneyway.fly.dev/daybooks'
 
 
 @pytest.fixture(scope="function")
@@ -28,6 +28,13 @@ def login_page(driver):
     return driver
 
 
+@pytest.fixture
+def logged_in_driver(login_page):
+    login(login_page, "test@gmail.com", "123456")
+    return login_page
+
+
+@pytest.fixture
 def login(driver, email, password):
     driver.find_element(By.ID, "user_email").send_keys(email)
     driver.find_element(By.ID, "user_password").send_keys(password)
