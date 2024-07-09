@@ -3,6 +3,8 @@ import pytest
 from conftest import logged_in_driver, add_expense, navigate_to_expense_page
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.alert import Alert
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 
@@ -32,27 +34,24 @@ def test_remove_expense(logged_in_driver):
     add_expense(logged_in_driver, title_to_remove, "Groceries", "Test description", "30", "2024-07-07")
     assert check_success_message(logged_in_driver, "Expense was created successfully.")
 
-    # Navigate to expense page
-    navigate_to_expense_page(logged_in_driver)
+    # Wait for the expense row containing the title_to_remove
+    expense_row_xpath = f'//tr[.//a[text()="{title_to_remove}"]]'
+    expense_row = WebDriverWait(logged_in_driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, expense_row_xpath))
+    )
 
-    # Locate the expense to remove by title
-    expense_link = logged_in_driver.find_element(By.LINK_TEXT, title_to_remove)
-    expense_id = expense_link.get_attribute("href").split("/")[-1]
-
-    # Construct the delete URL
-    delete_url = f"/expenses/{expense_id}"
-
-    # Click the remove button (if directly available)
-    # In case the remove button is not available directly, navigate to the edit page
-    # and click the delete button there
-    logged_in_driver.get(delete_url)
+    # Optionally, perform actions on the found expense_row
+    # For example, clicking the delete button within the row
+    delete_button = expense_row.find_element(By.CSS_SELECTOR, 'a[href*="/expenses/"]')
+    delete_button.click()
 
     # Handle the confirmation pop-up
     alert = Alert(logged_in_driver)
+
+    # Optionally, assert the text of the alert message
+    assert "Are you sure?" in alert.text  # Adjust the text according to your application
+
+    # Accept the alert (confirm the action)
     alert.accept()
 
-    # Verify that the expense is no longer present
-    navigate_to_expense_page(logged_in_driver)
-    expense_links = logged_in_driver.find_elements(By.CSS_SELECTOR, 'a[href^="/expenses/"]')
-    expense_titles = [link.text for link in expense_links]
-    assert title_to_remove not in expense_titles
+    assert not logged_in_driver.find_elements(By.LINK_TEXT, title_to_remove)
