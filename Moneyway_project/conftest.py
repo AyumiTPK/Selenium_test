@@ -56,7 +56,7 @@ def navigate_to_expense_page(driver):
     driver.find_element(By.CSS_SELECTOR, 'a[href="/expenses/new"]').click()
 
 
-def add_expense(driver, title, types, description, amount, date):
+def add_expense(driver, title, types, description, amount, date, exceptional=False):
     navigate_to_expense_page(driver)
 
     driver.find_element(By.ID, "expense_title").send_keys(title)
@@ -65,5 +65,9 @@ def add_expense(driver, title, types, description, amount, date):
     driver.find_element(By.ID, "expense_description").send_keys(description)
     driver.find_element(By.ID, "expense_amount").send_keys(amount)
     driver.find_element(By.ID, "expense_date").send_keys(date)
+
+    if exceptional:
+        driver.find_element(By.ID, "expense_exceptional_expense").click()
+
     driver.find_element(By.CSS_SELECTOR, "input.btn.btn-primary").click()
 
