@@ -42,11 +42,12 @@ def test_remove_expense(logged_in_driver):
 
     # Optionally, perform actions on the found expense_row
     # For example, clicking the delete button within the row
-    delete_button = expense_row.find_element(By.CSS_SELECTOR, 'a[href*="/expenses/"]')
+    delete_button = expense_row.find_element(By.CSS_SELECTOR, 'a[data-confirm]')
     delete_button.click()
 
     # Handle the confirmation pop-up
-    alert = Alert(logged_in_driver)
+    WebDriverWait(logged_in_driver, 10).until(EC.alert_is_present())
+    alert = logged_in_driver.switch_to.alert
 
     # Optionally, assert the text of the alert message
     assert "Are you sure?" in alert.text  # Adjust the text according to your application
@@ -54,4 +55,5 @@ def test_remove_expense(logged_in_driver):
     # Accept the alert (confirm the action)
     alert.accept()
 
+    # Verify that the expense has been removed
     assert not logged_in_driver.find_elements(By.LINK_TEXT, title_to_remove)
