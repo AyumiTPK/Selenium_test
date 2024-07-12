@@ -34,10 +34,12 @@ def logged_in_driver(driver):
     return driver
 
 
-def login(driver, email, password):
+def login(driver, email, password, remember_me=False):
     driver.get(URL_LOGIN)
     driver.find_element(By.ID, "user_email").send_keys(email)
     driver.find_element(By.ID, "user_password").send_keys(password)
+    if remember_me:
+        driver.find_element(By.ID, "user_remember_me").click()
     driver.find_element(By.CLASS_NAME, "btn-primary").click()
 
 
